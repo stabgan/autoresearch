@@ -68,6 +68,36 @@ pyproject.toml  — dependencies
 
 - [miolini/autoresearch-macos](https://github.com/miolini/autoresearch-macos)
 
+## Embedding mode (experimental)
+
+In addition to pretraining research, this repo supports autonomous experimentation on **embedding model finetuning** using contrastive learning (TripletLoss) with Qwen3-Embedding-0.6B.
+
+### Quick start (embedding)
+
+```bash
+# 1. Install dependencies (includes sentence-transformers)
+uv sync
+
+# 2. Prepare data (point to your train/test CSVs)
+uv run embedding/prepare_embedding.py --train-csv /path/to/train.csv --test-csv /path/to/test.csv
+
+# 3. Run a single embedding experiment
+cd embedding && uv run train_embedding.py
+```
+
+### Embedding project structure
+
+```
+embedding/
+├── prepare_embedding.py    — fixed constants, data loading, evaluation (do not modify)
+├── train_embedding.py      — triplet building, training loop, hyperparameters (agent modifies this)
+└── program_embedding.md    — agent instructions for embedding experiments
+```
+
+The agent modifies `train_embedding.py` to experiment with loss functions, hard negative mining, margins, batch sizes, epochs, and other hyperparameters. The metric is **accuracy@1** (higher is better).
+
+Data format: CSV with columns `ppid`, `pid`, `group_title`, `episode_title`, `description`. Same `pid` = same entity (positive pairs), same `ppid` different `pid` = hard negatives.
+
 ## License
 
 MIT
